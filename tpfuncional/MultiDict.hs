@@ -25,19 +25,23 @@ pad i = replicate i ' '
 
 instance (Show a, Show b) => Show (MultiDict a b) where
   show x = "{" ++ padMD 0 x ++ "}"
-
---foldMD :: ??
-foldMD = undefined
+--foldMD :: (funcion ) b (multidicc p q) b
+foldMD :: b ->   (a -> c -> b -> b) -> (a -> b -> b -> b) ->  (MultiDict a c) -> b
+foldMD cb fe fm  Nil = cb
+foldMD cb fe fm  (Entry k v multidicc) = fe k v (foldMD cb fe fm   multidicc)
+foldMD cb fe fm   (Multi k m1 m2) = fm k (foldMD cb fe fm m1) (foldMD cb fe fm  m2)
 
 recMD :: b  -> (a -> c -> MultiDict a c -> b -> b) -> (a -> MultiDict a c -> MultiDict a c -> b -> b -> b) -> MultiDict a c -> b
-recMD = undefined
+recMD cb fe fm  Nil = cb
+recMD cb fe fm  (Entry k v multidicc) = fe k v (multidicc) (recMD cb fe fm   multidicc)
+recMD cb fe fm  (Multi k m1 m2) = fm k m1 m2 (recMD cb fe fm m1) (recMD cb fe fm  m2)
 
 profundidad :: MultiDict a b -> Integer
-profundidad = undefined
+profundidad = recMD 0 (\k v m1 r1 -> max 1 r1) (\k m1 m2 r1 r2 -> 1 + (max 1 (max r1 r2)))
 
 --Cantidad total de claves definidas en todos los niveles.
 tamaño :: MultiDict a b -> Integer
-tamaño = undefined
+tamaño = foldMD 0 (\k v r1 -> r1 + 1) (\k r1 r2 -> 1 + r1 + r2 )
 
 podarHasta = foldMD
           (\_ _ _ -> Nil)
@@ -54,7 +58,10 @@ podar long prof m = podarHasta m long prof long
 --Dado un entero n, define las claves de n en adelante, cada una con su tabla de multiplicar.
 --Es decir, el valor asociado a la clave i es un diccionario con las claves de 1 en adelante, donde el valor de la clave j es i*j.
 tablas :: Integer -> MultiDict Integer Integer
-tablas = undefined
+tablas n = Multi n (tablaDelDesde n 1) (tablas (n + 1))
+
+tablaDelDesde :: Integer -> Integer -> MultiDict Integer Integer
+tablaDelDesde n a = Entry a (n * a) (tablaDelDesde n (a + 1))
 
 serialize :: (Show a, Show b) => MultiDict a b -> String
 serialize = undefined
