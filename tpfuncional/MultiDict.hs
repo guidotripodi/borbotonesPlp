@@ -37,7 +37,7 @@ recMD cb fe fm  (Entry k v multidicc) = fe k v (multidicc) (recMD cb fe fm   mul
 recMD cb fe fm  (Multi k m1 m2) = fm k m1 m2 (recMD cb fe fm m1) (recMD cb fe fm  m2)
 
 profundidad :: MultiDict a b -> Integer
-profundidad = recMD 0 (\k v m1 r1 -> max 1 r1) (\k m1 m2 r1 r2 -> 1 + (max 1 (max r1 r2)))
+profundidad = foldMD 0 (\k v r1 -> max 1 r1) (\k r1 r2 -> 1 + (max 1 (max r1 r2)))
 
 --Cantidad total de claves definidas en todos los niveles.
 tamaño :: MultiDict a b -> Integer
@@ -67,7 +67,7 @@ serialize :: (Show a, Show b) => MultiDict a b -> String
 serialize = undefined
 
 mapMD :: (a->c) -> (b->d) -> MultiDict a b -> MultiDict c d
-mapMD = undefined
+mapMD f g = foldMD Nil (\k v r1 -> Entry (f k) (g v) r1) (\k r1 r2 ->  Multi (f k) r1 r2)
 
 --Filtra recursivamente mirando las claves de los subdiccionarios.
 filterMD :: (a->Bool) -> MultiDict a b -> MultiDict a b
@@ -90,4 +90,3 @@ definir (x:xs) v d = (recMD (\ks -> cadena v ks)
 
 obtener :: Eq a => [a] -> MultiDict a b -> Maybe b
 obtener = undefined
-
