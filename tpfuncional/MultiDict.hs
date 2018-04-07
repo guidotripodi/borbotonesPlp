@@ -67,7 +67,7 @@ serialize :: (Show a, Show b) => MultiDict a b -> String
 serialize = undefined
 
 mapMD :: (a->c) -> (b->d) -> MultiDict a b -> MultiDict c d
-maprD f g = foldMD Nil (\k v r1 -> Entry (f k) (g v) r1) (\k r1 r2 ->  Multi (f k) r1 r2)
+mapMD f g = foldMD Nil (\k v r1 -> Entry (f k) (g v) r1) (\k r1 r2 ->  Multi (f k) r1 r2)
 
 --Filtra recursivamente mirando las claves de los subdiccionarios.
 filterMD :: (a->Bool) -> MultiDict a b -> MultiDict a b
