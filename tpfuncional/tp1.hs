@@ -116,12 +116,7 @@ allTests = test [
   "ejercicio1b" ~: tests2,
   "ejercicio2a" ~: tests3,
   "ejercicio2b" ~: tests4,
-  "ejercicio3" ~: tests5,
-  "ejercicio4" ~: tests6,
-  "ejercicio5a" ~: tests7,
-  "ejercicio5b" ~: tests8,
-  "ejercicio6" ~: tests9,
-  "ejercicio7" ~: tests10
+  "ejercicio3" ~: tests5
   ]
 
 tests1 = test [
@@ -166,3 +161,10 @@ tests10 = test [
    obtener [2,3,5] cuatroNiveles ~=? Nothing,
    obtener [6,7] infinito ~=? Just 42
   ]
+
+
+ --"ejercicio4" ~: tests6,
+ -- "ejercicio5a" ~: tests7,
+ -- "ejercicio5b" ~: tests8,
+ -- "ejercicio6" ~: tests9,
+ -- "ejercicio7" ~: tests10

@@ -64,7 +64,7 @@ tablaDelDesde :: Integer -> Integer -> MultiDict Integer Integer
 tablaDelDesde n a = Entry a (n * a) (tablaDelDesde n (a + 1))
 
 serialize :: (Show a, Show b) => MultiDict a b -> String
-serialize = undefined
+serialize =  foldMD "[ ]" (\k v r -> "[" ++ (show k) ++ ":" ++ (show v) ++ "," ++ r ++ "]" ) (\k r1 r2 -> "[" ++ (show k) ++ ":" ++ r1 ++ "," ++ r2 ++ "]")
 
 mapMD :: (a->c) -> (b->d) -> MultiDict a b -> MultiDict c d
 mapMD f g = foldMD Nil (\k v r1 -> Entry (f k) (g v) r1) (\k r1 r2 ->  Multi (f k) r1 r2)
@@ -74,7 +74,13 @@ filterMD :: (a->Bool) -> MultiDict a b -> MultiDict a b
 filterMD p = foldMD Nil (\k v r -> if p k then Entry k v r else r) (\k r1 r2 -> if p k then Multi k r1 r2 else r2)
 
 enLexicon :: [String] -> MultiDict String b -> MultiDict String b
-enLexicon = undefined
+enLexicon p = foldMD Nil (\k v r -> if (existeEnLista k p) then Entry (convertirAMinuscula k) v r else r) (\k r1 r2 -> if (existeEnLista k p) then Multi (convertirAMinuscula k) r1 r2 else r2)
+
+existeEnLista:: String -> [String] -> Bool
+existeEnLista = undefined
+
+convertirAMinuscula:: String -> String 
+convertirAMinuscula = undefined
 
 cadena :: Eq a => b ->  [a] -> MultiDict a b
 cadena = undefined
