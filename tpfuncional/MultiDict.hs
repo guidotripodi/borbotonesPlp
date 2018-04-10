@@ -37,7 +37,7 @@ recMD cb fe fm  (Entry k v multidicc) = fe k v (multidicc) (recMD cb fe fm   mul
 recMD cb fe fm  (Multi k m1 m2) = fm k m1 m2 (recMD cb fe fm m1) (recMD cb fe fm  m2)
 
 profundidad :: MultiDict a b -> Integer
-profundidad = foldMD 0 (\k v r1 -> max 1 r1) (\k r1 r2 -> 1 + (max 1 (max r1 r2)))
+profundidad = foldMD 0 (\k v r1 -> max 1 r1) (\k r1 r2 -> (max (r1+1) r2))
 
 --Cantidad total de claves definidas en todos los niveles.
 tamaño :: MultiDict a b -> Integer
