@@ -112,7 +112,7 @@ main :: IO Counts
 main = do runTestTT allTests
 
 allTests = test [
-  "ejercicio1a" ~: tests2,
+  "ejercicio1a" ~: tests1,
   "ejercicio1b" ~: tests2,
   "ejercicio2a" ~: tests3,
   "ejercicio2b" ~: tests4,
