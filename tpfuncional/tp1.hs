@@ -119,7 +119,8 @@ allTests = test [
   "ejercicio3" ~: tests5, 
   "ejercicio4" ~: tests6,
   "ejercicio5a" ~: tests7,
-  "ejercicio5b" ~: tests8
+  "ejercicio5b" ~: tests8,
+   "ejercicio6" ~: tests9
   ]
 
 tests1 = test [

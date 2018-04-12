@@ -66,7 +66,7 @@ tablaDelDesde :: Integer -> Integer -> MultiDict Integer Integer
 tablaDelDesde n a = Entry a (n * a) (tablaDelDesde n (a + 1))
 
 serialize :: (Show a, Show b) => MultiDict a b -> String
-serialize =  foldMD "[ ]" (\k v r -> "[" ++ (show k) ++ ": " ++ (show v) ++ ", " ++ r ++ "]" ) (\k r1 r2 -> "[" ++ (show k) ++ ": " ++ r1 ++ "," ++ r2 ++ "] ")
+serialize =  foldMD "[ ]" (\k v r -> "[" ++ (show k) ++ ": " ++ (show v) ++ ", " ++ r ++ "]" ) (\k r1 r2 -> "[" ++ (show k) ++ ": " ++ r1 ++ ", " ++ r2 ++ "]")
 
 mapMD :: (a->c) -> (b->d) -> MultiDict a b -> MultiDict c d
 mapMD f g = foldMD Nil (\k v r1 -> Entry (f k) (g v) r1) (\k r1 r2 ->  Multi (f k) r1 r2)
@@ -77,7 +77,6 @@ filterMD p = foldMD Nil (\k v r -> if p k then Entry k v r else r) (\k r1 r2 -> 
 
 enLexicon :: [String] -> MultiDict String b -> MultiDict String b
 enLexicon p = foldMD Nil (\k v r -> if (elem (convertirAMinuscula k) p) then Entry (convertirAMinuscula k) v r else r) (\k r1 r2 -> if (elem (convertirAMinuscula k) p) then Multi (convertirAMinuscula k) r1 r2 else r2)
-
 
 convertirAMinuscula:: String -> String 
 convertirAMinuscula = foldr (\c r-> (toLower c) : r) [] 
