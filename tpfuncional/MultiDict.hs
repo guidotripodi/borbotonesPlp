@@ -93,5 +93,8 @@ definir (x:xs) v d = (recMD (\ks -> cadena v ks)
        (\k1 m1 m2 r1 r2 (k:ks) -> if k1 == k then armarDic ks k m2 (r1 ks) else Multi k1 m1 (r2 (k:ks)))) d (x:xs)
   where armarDic ks k resto interior = if null ks then Entry k v resto else Multi k interior resto
 
-obtener :: Eq a => [a] -> MultiDict a b -> Maybe b
-obtener = undefined
+obtener :: Eq a => [a] -> MultiDict a b -> Maybe b 
+obtener (x:xs) d = (foldMD (\ks -> Nothing) (fEntry) (fMulti)) d (x:xs)
+  where fEntry k1 v r (k:ks) = if null ks then Nothing else ( if k == k1 && (null ks) then Just v else r)
+        fMulti k1 v r1 r2 (k:ks) = if (k == k1) && (not (null ks)) then r1 else (if (k == k1) && (null ks) then Just v else r2 ) 
+  --foldMD Nothing (\k v r -> if a == k && as == Nil then v else r) (\k v r1 r2 -> if a == k && as != Nil then r1 else (if a == k && as == Nil then v else r2 ) )
