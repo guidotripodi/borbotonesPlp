@@ -96,19 +96,15 @@ definir (x:xs) v d = (recMD (\ks -> cadena v ks)
 obtener :: Eq a => [a] -> MultiDict a b -> Maybe b 
 obtener (x:xs) d = (foldMD (\ks -> Nothing) (fEntry) (fMulti)) d (x:xs)
   where fEntry k1 v r (k:ks) =
-            if null ks then 
-                Nothing 
+            if null ks && (k == k1) then 
+                Just v 
             else 
-                if k == k1 && (null ks) then 
-                    Just v 
-                else 
-                    r (k:ks)
+                r (k:ks)
         fMulti k1 r1 r2 (k:ks) = 
-            if (k == k1) && (not (null ks)) then 
-                r1 ks 
+            if (k == k1) then 
+                if (null ks) then 
+                    r2 (k:ks)
+                else
+                    r1 ks 
             else 
-                if (k == k1) && (null ks) then 
-                    Nothing -- Lista vacia y termine en un multi, no hay valor 
-                else 
-                    r2 (k:ks)  
-  --foldMD Nothing (\k v r -> if a == k && as == Nil then v else r) (\k v r1 r2 -> if a == k && as != Nil then r1 else (if a == k && as == Nil then v else r2 ) )
+                r2 (k:ks)
