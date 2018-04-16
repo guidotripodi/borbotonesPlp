@@ -11,6 +11,18 @@ infinito = tablas 1
 cuatroNiveles :: MultiDict Integer Char
 cuatroNiveles = Entry 1 'a' (Multi 2 (Entry 2 'b' (Multi 3 (Entry 3 'c' (Multi 4 (Entry 4 'd' Nil) Nil)) Nil)) Nil)
 
+tresNiveles5long :: MultiDict Integer Char
+tresNiveles5long = Entry 1 'a' (Multi 2 (Entry 2 'b' (Multi 3 (Entry 3 'c' (Multi 4 (Nil) Nil)) Nil)) Nil)
+
+cincoNiveles :: MultiDict Integer Char
+cincoNiveles = Entry 1 'a' (Multi 2 (Entry 2 'b' (Multi 3 (Entry 3 'c' (Multi 4 (Entry 4 'd'(Multi 5 (Entry 5 'e' Nil) Nil)) Nil)) Nil)) Nil)
+
+nillMulti:: MultiDict Integer Char
+nillMulti =  Nil
+
+podaUno :: MultiDict Integer Char
+podaUno = Entry 1 'a' Nil
+
 superinfinito :: MultiDict Integer Integer
 superinfinito = Multi 1 (Entry 1 1 superinfinito) (mapMD (+1) (*2) superinfinito)
 
@@ -112,6 +124,7 @@ main :: IO Counts
 main = do runTestTT allTests
 
 allTests = test [
+-- test catedra
   "ejercicio1a" ~: tests1,
   "ejercicio1b" ~: tests2,
   "ejercicio2a" ~: tests3,
@@ -120,7 +133,17 @@ allTests = test [
   "ejercicio4" ~: tests6,
   "ejercicio5a" ~: tests7,
   "ejercicio5b" ~: tests8,
-   "ejercicio6" ~: tests9
+   "ejercicio6" ~: tests9,
+   "ejercicio7" ~: tests10,
+  --test propios
+   "ejercicio3" ~: tests11,
+    "ejercicio2a" ~: tests12,
+    "ejercicio2b" ~: test13,
+    "ejercicio3" ~: test14,
+    "ejercicio4y5" ~: test15,
+    "ejercicio6" ~: test16,
+   "ejercicio7" ~: test17
+     
   ]
 
 tests1 = test [
@@ -165,6 +188,72 @@ tests10 = test [
    obtener [2,3,5] cuatroNiveles ~=? Nothing,
    obtener [6,7] infinito ~=? Just 42
   ]
+
+
+
+--tests propios
+--test podar
+tests11 = test [
+   podar 0 0 cincoNiveles ~=? nillMulti,
+   podar 1 1 cincoNiveles ~=? podaUno,
+   podar 5 3 cincoNiveles ~=? tresNiveles5long
+  ]
+
+--test profundidad
+tests12 = test [
+   profundidad cincoNiveles ~=? 5,
+   profundidad podaUno ~=? 1,
+   profundidad nillMulti ~=? 0,
+   profundidad tresNiveles5long ~=? 3
+  ]
+
+--test tamano
+test13 = test [
+    tamaño cuatroNiveles ~=? 7,
+    tamaño cincoNiveles ~=? 9,
+   tamaño podaUno ~=? 1,
+   tamaño nillMulti ~=? 0,
+   (tamaño $ podar 0 0 cuatroNiveles) ~=? 0,
+   (tamaño $ podar 7 0 cuatroNiveles) ~=? 0,
+   (tamaño $ podar 3 4 cuatroNiveles) ~=? 7,
+   tamaño tresNiveles5long ~=? 6
+  ]
+
+--test tablas infinita
+test14 = test [
+ (podar 5 3 $ tablas 5) ~=? (podar 5 2 $ tablas 5),
+   (profundidad $ podar 10 20 infinito) ~=? 2,
+   (tamaño $ podar 10 1 $ tablas 55) ~=? 10,
+   (tamaño $ podar 110 100 $ tablas (10*10*10)) ~=? 12210
+  ]
+
+--test serialize filtermd y enlexicon
+test15 = test [
+  serialize cincoNiveles ~=? "[1: 'a', [2: [2: 'b', [3: [3: 'c', [4: [4: 'd', [5: [5: 'e', [ ]], [ ]]], [ ]]], [ ]]], [ ]]]",
+ (serialize $ filterMD even $ Entry 5 'e' cincoNiveles) ~=? "[2: [2: 'b', [ ]], [ ]]",
+  (serialize $ filterMD even $ Entry 1 '1' nillMulti) ~=? "[ ]",
+   (serialize $ enLexicon ["hola", "como", "estas"] datosLlamada) ~=? "[ ]",
+    (serialize $ enLexicon [ "connid", "calltype", "hola","otherdnrole", "propagated"] datosLlamada) ~=? "[\"connid\": \"000202BA29A61AD6\", [\"calltype\": \"2 [Inbound]\", [\"otherdnrole\": \"1 [RoleOrigination]\", [ ]]]]"
+  ]
+  
+  --test cadena usando definir
+
+test16 = test [
+   (profundidad $ definir [4,8] 'g' $ definir [4] 'e' $ definir [2,4] 'f' $ definir [2,3,4,5] 'e' nillMulti) ~=? 4,
+   (serialize $ definir [4,8] 'g' $ definir [4] 'e' $ definir [2,4] 'f' $ definir [2,3,4,5] 'e' nillMulti) ~=? "[2: [3: [4: [5: 'e', [ ]], [ ]], [4: 'f', [ ]]], [4: [8: 'g', [ ]], [ ]]]" ,
+   (serialize $ definir [4,8] 'g' $ definir [4] 'e' $ definir [2,4] 'f' $ definir [2,3,4,5] 'e' cincoNiveles) ~=? "[1: 'a', [2: [2: 'b', [3: [3: 'c', [4: [4: 'd', [5: 'e', [ ]]], [ ]]], [4: 'f', [ ]]]], [4: [8: 'g', [ ]], [ ]]]]"
+  ]
+
+--test obtener usando definir
+
+test17 = test [
+   (obtener [2,3,4,5] $ definir [3,4] 'g' $ definir [4,5] 'e' $ definir [2,3,4] 'f' $ definir [2,3,4,5] 'e' cincoNiveles) ~=? Just 'e',
+   obtener [2,3,3] cincoNiveles ~=? Just 'c',
+   obtener [2,3,5] cuatroNiveles ~=? Nothing,
+   obtener [2,3,4,5,6] nillMulti ~=? Nothing,
+   obtener [25,26] infinito ~=? Just 650
+  ]
+
 
 
  --"ejercicio4" ~: tests6,
