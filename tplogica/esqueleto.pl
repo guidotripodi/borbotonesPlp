@@ -26,7 +26,10 @@ tieneEstrella(star(_)).
 
 % Ejercicio 2: longitudMaxima(+RegEx, -Length)
 
-longitudMaxima(_, _) :- fail.
+longitudMaxima(empty, 0).
+longitudMaxima(Cadena,LONG) :- symbol(Cadena), LONG is 1.
+longitudMaxima(or(X,Y), LONG) :- not(tieneEstrella(or(X,Y))), longitudMaxima(X, LONG1), longitudMaxima(Y,LONG2), LONG is max(LONG1,LONG2).
+longitudMaxima(concat(X,Y), LONG) :- not(tieneEstrella(concat(X,Y))), longitudMaxima(X, LONG1), longitudMaxima(Y, LONG2), LONG is LONG1 + LONG2.
 
 % Ejercicio 3: cadena(?Cadena)
 
@@ -35,7 +38,12 @@ cadena([X | XS]):- cadena(XS), symbol(X).
 
 % Ejercicio 4: match_inst(+Cadena, +RegEx)
 
-match_inst(_, _) :- fail.
+match_inst([], empty).
+match_inst([X], X) :- symbol(X).
+match_inst(CADENA, or(X,_)) :- match_inst(CADENA, X).
+match_inst(CADENA, or(_,Y)) :- match_inst(CADENA, Y).
+
+%para concat deberia usar append???
 
 % Ejercicio 5: match(?Cadena, +RegEx)
 
