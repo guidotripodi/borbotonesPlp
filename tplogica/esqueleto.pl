@@ -42,6 +42,9 @@ match_inst([], empty).
 match_inst([X], X) :- symbol(X).
 match_inst(CADENA, or(X,_)) :- match_inst(CADENA, X).
 match_inst(CADENA, or(_,Y)) :- match_inst(CADENA, Y).
+match_inst([X|XS], concat(Y,Z)) :- match_inst(X,Y). match_inst(XS, Z).
+match_inst([X|XS], star(Y)) :- match_inst(X, Y). match_inst(XS, star(Y)).
+match_inst([X|XS], star(Y)) :- match_inst(XS, star(X)).
 
 %para concat deberia usar append???
 
