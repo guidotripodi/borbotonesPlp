@@ -46,7 +46,7 @@ match_inst(CADENA, concat(Y,Z)) :- append(C1, C2, CADENA), match_inst(C2, Z), ma
 %star es mesdio complejo, porque puede contener una expresion regular dentro, 
 %entonces hay que chequear si existe una subcadena tal que matchee 0 o más veces con la misma. 
 match_inst([], star(_)). %0 apariciones
-match_inst(CADENA, star(Y)) :- append(C1, C2, CADENA), match_inst(C2, star(Y)), match_inst(C1, Y).
+match_inst(CADENA, star(Y)) :- append(C1, C2, CADENA), match_inst(C1, Y), match_inst(C2, star(Y)).
 
 %para concat deberia usar append??? y, si.
 
