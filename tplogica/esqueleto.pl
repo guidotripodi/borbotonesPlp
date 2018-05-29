@@ -7,7 +7,7 @@ symbol(c).
 regexEj(1, a). % a
 regexEj(2, or(a, b)). % a|b
 regexEj(3, concat(E1, E2)) :- regexEj(1, E1), regexEj(2, E2). % a(a|b)
-regexEj(4, star(E2)) :- regexEj(2, E2). % (a(a|b))*
+regexEj(4, star(E2)) :- regexEj(2, E2). % (a|b)*
 regexEj(5, or(star(E1), E4)) :- regexEj(1, E1), regexEj(4, E4). % (a*|(a(a|b))*)
 regexEj(6, star(or(a, ab))). %(a|ab)*
 regexEj(7, concat(or(a, concat(a,b)), or(b, empty))). %(a|ab)(b|)
@@ -39,22 +39,20 @@ cadena([X | XS]):- cadena(XS), symbol(X).
 % Ejercicio 4: match_inst(+Cadena, +RegEx)
 
 match_inst([], empty).
+match_inst([], star(_)). %0 apariciones
 match_inst([X], X) :- symbol(X).
 match_inst(CADENA, or(X,_)) :- match_inst(CADENA, X).
 match_inst(CADENA, or(_,Y)) :- match_inst(CADENA, Y).
 match_inst(CADENA, concat(Y,Z)) :- append(C1, C2, CADENA), match_inst(C2, Z), match_inst(C1,Y).
-%star es mesdio complejo, porque puede contener una expresion regular dentro, 
-%entonces hay que chequear si existe una subcadena tal que matchee 0 o más veces con la misma. 
-match_inst([], star(_)). %0 apariciones
 match_inst(CADENA, star(Y)) :- append(C1, C2, CADENA), match_inst(C1, Y), match_inst(C2, star(Y)).
 
 %para concat deberia usar append??? y, si.
 
 % Ejercicio 5: match(?Cadena, +RegEx)
 
-% Como cadena no se sabe si esta instanciada me fijo la valides y luego macheo falta machearla cadena
+% Como cadena no se sabe si esta instanciada me fijo la validez y luego macheo falta machearla cadena
 
-match(L, E) :- cadena(L), match_inst(L, E).
+match(L, E) :-  match_inst(L, E), cadena(L).
 
 % Ejercicio 6: diferencia(?Cadena, +RegEx, +RegEx)
 
@@ -62,7 +60,9 @@ diferencia(L, Exp1, Exp2) :- match(L, Exp1), not(match(L,Exp2)).
 
 % Ejercicio 7: prefijoMaximo(?Prefijo, +Cadena, +RegEx)
 
-prefijoMaximo(_, _, _) :- fail.
+
+prefijoMaximo(PRE, CADENA, Exp) :- append(PRE, _, CADENA), match(PRE, Exp), prefijos(CADENA, Exp, P1), length(PRE) >= length(P1).
+prefijos(CADENA, Exp, P1) :- append(P1, _, CADENA), match_inst(P1, Exp).
 
 % Ejercicio 8: reemplazar(+X, +R, +E, Res)
 
