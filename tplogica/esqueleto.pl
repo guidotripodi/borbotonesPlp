@@ -42,11 +42,13 @@ match_inst([], empty).
 match_inst([X], X) :- symbol(X).
 match_inst(CADENA, or(X,_)) :- match_inst(CADENA, X).
 match_inst(CADENA, or(_,Y)) :- match_inst(CADENA, Y).
-match_inst([X|XS], concat(Y,Z)) :- match_inst(X,Y). match_inst(XS, Z).
-match_inst([X|XS], star(Y)) :- match_inst(X, Y). match_inst(XS, star(Y)).
-match_inst([X|XS], star(Y)) :- match_inst(XS, star(X)).
+match_inst(CADENA, concat(Y,Z)) :- append(C1, C2, CADENA), match_inst(C2, Z), match_inst(C1,Y).
+%star es mesdio complejo, porque puede contener una expresion regular dentro, 
+%entonces hay que chequear si existe una subcadena tal que matchee 0 o más veces con la misma. 
+match_inst([], star(_)). %0 apariciones
+match_inst(CADENA, star(Y)) :- append(C1, C2, CADENA), match_inst(C2, star(Y)), match_inst(C1, Y).
 
-%para concat deberia usar append???
+%para concat deberia usar append??? y, si.
 
 % Ejercicio 5: match(?Cadena, +RegEx)
 
