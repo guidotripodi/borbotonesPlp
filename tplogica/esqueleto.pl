@@ -43,7 +43,7 @@ match_inst([], star(_)). %0 apariciones
 match_inst([X], X) :- symbol(X).
 match_inst(CADENA, or(X,_)) :- match_inst(CADENA, X).
 match_inst(CADENA, or(_,Y)) :- match_inst(CADENA, Y).
-match_inst(CADENA, concat(Y,Z)) :- append(C1, C2, CADENA), match_inst(C2, Z), match_inst(C1,Y).
+match_inst(CADENA, concat(Y,Z)) :- append(C1, C2, CADENA), match_inst(C1,Y), match_inst(C2, Z).
 match_inst(CADENA, star(Y)) :- append(C1, C2, CADENA), match_inst(C1, Y), match_inst(C2, star(Y)).
 
 %para concat deberia usar append??? y, si.
@@ -52,7 +52,7 @@ match_inst(CADENA, star(Y)) :- append(C1, C2, CADENA), match_inst(C1, Y), match_
 
 % Como cadena no se sabe si esta instanciada me fijo la validez y luego macheo falta machearla cadena
 
-match(L, E) :-  match_inst(L, E), cadena(L).
+match(L, E) :- cadena(L), match_inst(L, E).
 
 % Ejercicio 6: diferencia(?Cadena, +RegEx, +RegEx)
 
@@ -61,9 +61,48 @@ diferencia(L, Exp1, Exp2) :- match(L, Exp1), not(match(L,Exp2)).
 % Ejercicio 7: prefijoMaximo(?Prefijo, +Cadena, +RegEx)
 
 
-prefijoMaximo(PRE, CADENA, Exp) :- append(PRE, _, CADENA), match(PRE, Exp), prefijos(CADENA, Exp, P1), length(PRE) >= length(P1).
-prefijos(CADENA, Exp, P1) :- append(P1, _, CADENA), match_inst(P1, Exp).
+% prefijoMaximo(PRE, CADENA, Exp) :- append(PRE, _, CADENA), match(PRE,
+% Exp), prefijos(CADENA, Exp, P1), length(PRE) >= length(P1).
+% prefijos(CADENA, Exp, P1) :- append(P1, _, CADENA), match_inst(P1,
+% Exp).
+
+pref(C1, C2) :- append(C1, _, C2).
+prefijoMaximo(PRE, CADENA, Exp) :- pref(PRE, CADENA).
 
 % Ejercicio 8: reemplazar(+X, +R, +E, Res)
 
 reemplazar(_, _, _, _) :- fail.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
