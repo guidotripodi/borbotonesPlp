@@ -63,7 +63,8 @@ hayPrefijoMayor(CADENA, Exp, T):- append(PRE1,_,CADENA), length(PRE1, TI), TI > 
 
 % Ejercicio 8: reemplazar(+X, +R, +E, Res)
 
-reemplazar(_, _, _, _) :- fail.
+reemplazar([], _, _, []).
+reemplazar(CADENA, Exp, IN, OUT) :- prefijoMaximo(PRE, CADENA, Exp), length(PRE,TamPRE), TamPRE > 0, append(PRE, D, CADENA), append(IN, OUTRec, OUT), reemplazar(D, Exp, IN, OUTRec).
 
 
 
