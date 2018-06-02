@@ -65,15 +65,34 @@ hayPrefijoMayor(CADENA, Exp, T):- append(PRE1,_,CADENA), length(PRE1, TI), TI > 
 
 reemplazar([], _, _, []).
 
-%lo q intento hacer aca es, tomar el prefijo quitarlo usar append para quedarme con lo nuevo y dsp llamo reemplazar, pero no funca.
+%si no tengo un prefijo que matchee, busco en la cola de la cadena.
+reemplazar([X | XS], Exp, Sust, [X | Rec]) :- 
+    not(prefijoMaximo(_, [X | XS], Exp)), 
+    reemplazar(XS, Exp, Sust, Rec).
 
-reemplazar(X, E, R, Res) :- prefijoMaximo(P, X, E), length(P,TamP), TamP > 0, append(P, D, X), reemplazar(D, E, R, Rec), append(R, Rec, Res).
+%Si el prefijo maximo es el vacio, lo saltamos.
+reemplazar([X | XS], Exp, Sust, [X | Rec]) :- 
+    prefijoMaximo([], [X | XS], Exp), 
+    reemplazar(XS, Exp, Sust, Rec).
 
-%aca tomo x xs y si hay prefijo con >0 que lo resuelva la recursion
-reemplazar([X | XS], E, R, [X | Res]) :- prefijoMaximo(P, [X | XS], E), length(P,TamP), TamP > 0, reemplazar(XS, E, R, Res).
+%Si hay un prefijo maximo bueno.
+reemplazar(Cadena, Exp, Sust, Res) :- 
+    prefijoMaximo(P, Cadena, Exp), 
+    length(P,TamP), 
+    TamP > 0, 
+    append(P, D, Cadena), 
+    reemplazar(D, Exp, Sust, Rec), 
+    append(Sust, Rec, Res).
 
-%si no tengo un prefijo que me cumpla devuelvo todo (no entiendo porq siempre cae en este caso)
-reemplazar([X | XS], E, R, [X | Res]) :- not(prefijoMaximo(_, [X | XS], E)), reemplazar(XS, E, R, Res).
+
+
+%reemplazar([X | XS], E, R, [X | Rec]) :- 
+%    prefijoMaximo(P1, [X | XS], E), 
+%    prefijoMaximo(P2, XS, E), 
+%    length(P1,TamP1), 
+%    length(P2,TamP2), 
+%    TamP1 > TamP2, 
+%    reemplazar(XS, E, R, Rec).
 
 % Habia pensado esto pero vamos con lo tuyo guido.
 % reemplazar(Cadena, Exp, In, Out) :-
