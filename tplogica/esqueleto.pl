@@ -64,8 +64,16 @@ hayPrefijoMayor(CADENA, Exp, T):- append(PRE1,_,CADENA), length(PRE1, TI), TI > 
 % Ejercicio 8: reemplazar(+X, +R, +E, Res)
 
 reemplazar([], _, _, []).
-reemplazar(CADENA, Exp, IN, OUT) :- prefijoMaximo(PRE, CADENA, Exp), length(PRE,TamPRE), TamPRE > 0, append(PRE, D, CADENA), append(IN, OUTRec, OUT), reemplazar(D, Exp, IN, OUTRec).
 
+%lo q intento hacer aca es, tomar el prefijo quitarlo usar append para quedarme con lo nuevo y dsp llamo reemplazar, pero no funca.
+
+reemplazar(X, E, R, Res) :- prefijoMaximo(P, X, E), length(P,TamP), TamP > 0, append(P, D, X), append(R, D, Res), reemplazar(D, E, R, Res).
+
+%aca tomo x xs y si hay prefijo con >0 que lo resuelva la recursion
+reemplazar([X | XS], E, R, [X | Res]) :- prefijoMaximo(P, [X | XS], E), length(P,TamP), TamP > 0, reemplazar(XS, E, R, Res).
+
+%si no tengo un prefijo que me cumpla devuelvo todo (no entiendo porq siempre cae en este caso)
+reemplazar([X | XS], E, R, [X | Res]) :- not(prefijoMaximo(_, [X | XS], E)), reemplazar(XS, E, R, Res).
 
 
 
