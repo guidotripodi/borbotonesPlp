@@ -44,7 +44,7 @@ match_inst(CADENA, or(X,_)) :- match_inst(CADENA, X).
 match_inst(CADENA, or(_,Y)) :- match_inst(CADENA, Y).
 match_inst(CADENA, concat(Y,Z)) :- append(C1, C2, CADENA), match_inst(C1,Y), match_inst(C2, Z).
 match_inst([], star(_)). %0 apariciones.
-match_inst(CADENA, star(star(Y))) :- match_inst(CADENA, Y). 
+%match_inst(CADENA, star(star(Y))) :- match_inst(CADENA, Y). %Esto esta mal!!! simplificarlo seria star(Y).
 match_inst(CADENA, star(Y)) :- append(C1, C2, CADENA), not(length(C1,0)), match_inst(C1, Y), match_inst(C2, star(Y)).
 
 % Ejercicio 5: match(?Cadena, +RegEx)
@@ -67,7 +67,7 @@ reemplazar([], _, _, []).
 
 %lo q intento hacer aca es, tomar el prefijo quitarlo usar append para quedarme con lo nuevo y dsp llamo reemplazar, pero no funca.
 
-reemplazar(X, E, R, Res) :- prefijoMaximo(P, X, E), length(P,TamP), TamP > 0, append(P, D, X), append(R, D, Res), reemplazar(D, E, R, Res).
+reemplazar(X, E, R, Res) :- prefijoMaximo(P, X, E), length(P,TamP), TamP > 0, append(P, D, X), reemplazar(D, E, R, Rec), append(R, Rec, Res).
 
 %aca tomo x xs y si hay prefijo con >0 que lo resuelva la recursion
 reemplazar([X | XS], E, R, [X | Res]) :- prefijoMaximo(P, [X | XS], E), length(P,TamP), TamP > 0, reemplazar(XS, E, R, Res).
@@ -75,35 +75,12 @@ reemplazar([X | XS], E, R, [X | Res]) :- prefijoMaximo(P, [X | XS], E), length(P
 %si no tengo un prefijo que me cumpla devuelvo todo (no entiendo porq siempre cae en este caso)
 reemplazar([X | XS], E, R, [X | Res]) :- not(prefijoMaximo(_, [X | XS], E)), reemplazar(XS, E, R, Res).
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+% Habia pensado esto pero vamos con lo tuyo guido.
+% reemplazar(Cadena, Exp, In, Out) :-
+%    subcadenaLongMax(Cadena, Exp, S),
+%    triappend(Pre, S, Suf, Cadena),
+%    reemplazar(Pre, Exp, In, R1),
+%    reemplazar(Suf, Exp, In, R2),
+%    triappend(R1, S, R2, Out).
 
 
