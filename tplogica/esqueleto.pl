@@ -85,21 +85,55 @@ reemplazar(Cadena, Exp, Sust, Res) :-
     append(Sust, Rec, Res).
 
 
+% test_2_Y: longitudMaxima
 
-%reemplazar([X | XS], E, R, [X | Rec]) :- 
-%    prefijoMaximo(P1, [X | XS], E), 
-%    prefijoMaximo(P2, XS, E), 
-%    length(P1,TamP1), 
-%    length(P2,TamP2), 
-%    TamP1 > TamP2, 
-%    reemplazar(XS, E, R, Rec).
+test_2_Y :- test_2_1, test_2_2, test_2_3.
 
-% Habia pensado esto pero vamos con lo tuyo guido.
-% reemplazar(Cadena, Exp, In, Out) :-
-%    subcadenaLongMax(Cadena, Exp, S),
-%    triappend(Pre, S, Suf, Cadena),
-%    reemplazar(Pre, Exp, In, R1),
-%    reemplazar(Suf, Exp, In, R2),
-%    triappend(R1, S, R2, Out).
+test_2_1 :- longitudMaxima(or(a, b), T), T == 1.
+test_2_2 :- longitudMaxima(concat(concat(concat(a,b),b),a),T), T == 4.
+test_2_3 :- longitudMaxima(or(concat(concat(a,b),b),a),T), T == 3.
+test_2_4 :- longitudMaxima(or(concat(concat(a,star(b)),b),a),T), T == false.
 
+% test_3_Y: longitudMaxima
 
+test_3_Y :- test_3_1, test_3_2, test_3_3, test_3_4.
+
+test_3_1 :- cadena(C), C == [a,b,c].
+test_3_2 :- cadena(C), C == [a,a,a,a,a].
+test_3_3 :- cadena(C), C == [a,a,b].
+test_3_4 :- cadena(C), C == [a,b,c,a,b].
+
+% test_5_Y: match
+
+test_5_Y :- test_5_1, test_5_2, test_5_3, test_5_4.
+
+test_5_1 :- match(X, star(a)), X == [a,a,a,a].
+test_5_2 :- match(X, star(concat(star(a), star(b)))), X == [a, b, b, a, a].
+test_5_3 :- match(X, star(or(star(a), star(b)))), X == [b, b].
+test_5_4 :- match(X,  or(star(a), star(b))), X = [b,b,b,b,b,b,b].
+
+% test_6_Y: diferencia
+
+test_6_Y :- test_6_1, test_6_2, test_6_3.
+
+test_6_1 :- diferencia(X, star(a), star(b)), X == [a, a, a, a, a, a, a].
+test_6_2 :- diferencia(X,concat(a,star(b)),c), X == [a, b, b, b, b, b, b, b, b].
+test_6_3 :- diferencia(X,concat(a,or(star(b),a)),c), X == [a, b, b, b, b, b, b, b].
+
+% test_7_Y: prefijoMaximo
+
+test_7_Y :- test_7_1, test_7_2,test_7_3.
+
+test_7_1 :- prefijoMaximo(P, [a,b,a,b,a,b], concat(star(a),star(b))), P == [a,b].
+test_7_2 :- prefijoMaximo(P, [a,a,a,b,b,b,b,b,a,b,b,b], concat(star(a),star(b))), P == [a, a, a, b, b, b, b, b].
+test_7_3 :- prefijoMaximo(P, [a,a,a,b,b,b,b,b,a,b,b,b], concat(a,star(b))), P == [a].
+
+% test_8_Y: reemplazar
+
+test_8_Y :- test_8_1, test_8_2,test_8_3.
+
+test_8_1 :- reemplazar([a,a,a,b,b,a,b,c],concat(a,star(b)), [1],X), X == [1, 1, 1, 1, c].
+test_8_2 :- reemplazar([a,a,a,b,b,a,b,c],or(a,star(b)), [1],X), X == [1, 1, 1, 1, 1, 1, c].
+test_8_3 :- reemplazar([a,a,a,b,b,a,b,c],concat(star(a),star(c)), [1],X), X == [1, b, b, 1, b, 1].
+
+all_Test :- test_2_Y,test_3_Y,test_5_Y,test_6_Y, test_7_Y, test_8_Y.
