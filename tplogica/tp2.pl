@@ -27,9 +27,17 @@ tieneEstrella(star(_)).
 % Ejercicio 2: longitudMaxima(+RegEx, -Length)
 
 longitudMaxima(empty, 0).
-longitudMaxima(Cadena,LONG) :- symbol(Cadena), LONG is 1.
-longitudMaxima(or(X,Y), LONG) :- not(tieneEstrella(or(X,Y))), longitudMaxima(X, LONG1), longitudMaxima(Y,LONG2), LONG is max(LONG1,LONG2).
-longitudMaxima(concat(X,Y), LONG) :- not(tieneEstrella(concat(X,Y))), longitudMaxima(X, LONG1), longitudMaxima(Y, LONG2), LONG is LONG1 + LONG2.
+longitudMaxima(Cadena,Long) :- symbol(Cadena), Long is 1.
+longitudMaxima(or(X,Y), Long) :- 
+    not(tieneEstrella(or(X,Y))), 
+    longitudMaxima(X, Long1), 
+    longitudMaxima(Y,Long2), 
+    Long is max(Long1,Long2).
+longitudMaxima(concat(X,Y), Long) :- 
+    not(tieneEstrella(concat(X,Y))), 
+    longitudMaxima(X, Long1), 
+    longitudMaxima(Y, Long2), 
+    Long is Long1 + Long2.
 
 % Ejercicio 3: cadena(?Cadena)
 
@@ -40,26 +48,42 @@ cadena([X | XS]):- cadena(XS), symbol(X).
 
 match_inst([], empty).
 match_inst([X], X) :- symbol(X).
-match_inst(CADENA, or(X,_)) :- match_inst(CADENA, X).
-match_inst(CADENA, or(_,Y)) :- match_inst(CADENA, Y).
-match_inst(CADENA, concat(Y,Z)) :- append(C1, C2, CADENA), match_inst(C1,Y), match_inst(C2, Z).
+match_inst(Cadena, or(X,_)) :- match_inst(Cadena, X).
+match_inst(Cadena, or(_,Y)) :- match_inst(Cadena, Y).
+match_inst(Cadena, concat(Y,Z)) :- 
+    append(C1, C2, Cadena), 
+    match_inst(C1,Y), 
+    match_inst(C2, Z).
 match_inst([], star(_)). %0 apariciones.
-%match_inst(CADENA, star(star(Y))) :- match_inst(CADENA, Y). %Esto esta mal!!! simplificarlo seria star(Y).
-match_inst(CADENA, star(Y)) :- append(C1, C2, CADENA), not(length(C1,0)), match_inst(C1, Y), match_inst(C2, star(Y)).
+match_inst(Cadena, star(Y)) :- 
+    append(C1, C2, Cadena), 
+    not(length(C1,0)), 
+    match_inst(C1, Y), 
+    match_inst(C2, star(Y)).
 
 % Ejercicio 5: match(?Cadena, +RegEx)
 
-match(L, E) :- cadena(L), match_inst(L, E).
+match(Cadena, RegEx) :- cadena(Cadena), match_inst(Cadena, RegEx).
 
 % Ejercicio 6: diferencia(?Cadena, +RegEx, +RegEx)
 
-diferencia(L, Exp1, Exp2) :- match(L, Exp1), not(match(L,Exp2)).
+diferencia(Cadena, Exp1, Exp2) :-
+    match(Cadena, Exp1), 
+    not(match(Cadena,Exp2)).
 
 % Ejercicio 7: prefijoMaximo(?Prefijo, +Cadena, +RegEx)
-prefijoMaximo(PRE, CADENA, Exp) :- append(PRE,_,CADENA), match(PRE, Exp), length(PRE, T), not(hayPrefijoMayor(CADENA,Exp,T)).
+prefijoMaximo(Prefijo, Cadena, Exp) :- 
+    append(Prefijo,_,Cadena), 
+    match(Prefijo, Exp), 
+    length(Prefijo, T), 
+    not(hayPrefijoMayor(Cadena,Exp,T)).
 
-%hayPrefijoMayor(+L,+E,+T)
-hayPrefijoMayor(CADENA, Exp, T):- append(PRE1,_,CADENA), length(PRE1, TI), TI > T, match(PRE1,Exp).
+%hayPrefijoMayor(+Cadena, +Exp, +T)
+hayPrefijoMayor(Cadena, Exp, T):- 
+    append(Prefijo,_,Cadena), 
+    length(Prefijo, TI), 
+    TI > T, 
+    match(Prefijo,Exp).
 
 % Ejercicio 8: reemplazar(+X, +R, +E, Res)
 
