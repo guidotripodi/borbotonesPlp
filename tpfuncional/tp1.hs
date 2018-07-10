@@ -247,7 +247,7 @@ test16 = test [
 --test obtener usando definir
 
 test17 = test [
-   (obtener [2,3,4,5] $ definir [3,4] 'g' $ definir [4,5] 'e' $ definir [2,3,4] 'f' $ definir [2,3,4,5] 'e' cincoNiveles) ~=? Just 'e',
+   (obtener [2,3,4,5] $ definir [3,4] 'g' $ definir [4,5] 'e' $ definir [2,3,4] 'f' $ definir [2,3,4,5] 'e' cincoNiveles) ~=? Nothing,
    obtener [2,3,3] cincoNiveles ~=? Just 'c',
    obtener [2,3,5] cuatroNiveles ~=? Nothing,
    obtener [2,3,4,5,6] nillMulti ~=? Nothing,
