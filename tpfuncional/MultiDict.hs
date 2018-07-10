@@ -118,14 +118,15 @@ definir (x:xs) v d = (recMD (\ks -> cadena v ks)
 
 obtener :: Eq a => [a] -> MultiDict a b -> Maybe b 
 obtener xs d = foldMD (const Nothing) fEntry fMulti d xs
-  where fEntry k1 v r (k:ks) =
-            if null ks && (k == k1) then 
-                Just v 
-            else 
-                r (k:ks)
-        fMulti k1 r1 r2 (k:ks) = 
-            if k == k1 then 
-                r1 ks 
-            else 
-                r2 (k:ks)
---TODO usar case of
+  where fEntry k1 v r claves =
+            case claves of [] -> Nothing
+                           (k:ks) -> if null ks && (k == k1) then 
+                                         Just v 
+                                     else 
+                                         r (k:ks)
+        fMulti k1 r1 r2 claves = 
+            case claves of [] -> Nothing
+                           (k:ks) -> if k == k1 then 
+                                         r1 ks 
+                                     else 
+                                         r2 (k:ks)
