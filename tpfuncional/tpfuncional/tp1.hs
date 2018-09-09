@@ -247,17 +247,10 @@ test16 = test [
 --test obtener usando definir
 
 test17 = test [
-   (obtener [2,3,4,5] $ definir [3,4] 'g' $ definir [4,5] 'e' $ definir [2,3,4] 'f' $ definir [2,3,4,5] 'e' cincoNiveles) ~=? Just 'e',
+   (obtener [2,3,4,5] $ definir [3,4] 'g' $ definir [4,5] 'e' $ definir [2,3,4] 'f' $ definir [2,3,4,5] 'e' cincoNiveles) ~=? Nothing,
    obtener [2,3,3] cincoNiveles ~=? Just 'c',
    obtener [2,3,5] cuatroNiveles ~=? Nothing,
    obtener [2,3,4,5,6] nillMulti ~=? Nothing,
    obtener [25,26] infinito ~=? Just 650
   ]
 
-
-
- --"ejercicio4" ~: tests6,
- -- "ejercicio5a" ~: tests7,
- -- "ejercicio5b" ~: tests8,
- -- "ejercicio6" ~: tests9,
- -- "ejercicio7" ~: tests10

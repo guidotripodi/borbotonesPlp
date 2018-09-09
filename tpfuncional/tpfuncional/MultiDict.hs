@@ -27,23 +27,21 @@ pad i = replicate i ' '
 
 instance (Show a, Show b) => Show (MultiDict a b) where
   show x = "{" ++ padMD 0 x ++ "}"
---foldMD :: (funcion ) b (multidicc p q) b
+
 foldMD :: b ->   (a -> c -> b -> b) -> (a -> b -> b -> b) ->  (MultiDict a c) -> b
-foldMD cb fe fm  Nil = cb
-foldMD cb fe fm  (Entry k v multidicc) = fe k v (foldMD cb fe fm   multidicc)
-foldMD cb fe fm   (Multi k m1 m2) = fm k (foldMD cb fe fm m1) (foldMD cb fe fm  m2)
+foldMD cb fe fm = recMD cb (\k v _ r -> fe k v r) (\k _ _ r1 r2 -> fm k r1 r2)
 
 recMD :: b  -> (a -> c -> MultiDict a c -> b -> b) -> (a -> MultiDict a c -> MultiDict a c -> b -> b -> b) -> MultiDict a c -> b
-recMD cb fe fm  Nil = cb
-recMD cb fe fm  (Entry k v multidicc) = fe k v (multidicc) (recMD cb fe fm   multidicc)
-recMD cb fe fm  (Multi k m1 m2) = fm k m1 m2 (recMD cb fe fm m1) (recMD cb fe fm  m2)
+recMD cb fe fm multi = case multi of Nil -> cb
+                                     Entry k v m1 -> fe k v m1 (recMD cb fe fm m1)
+                                     Multi k m1 m2 -> fm k m1 m2 (recMD cb fe fm m1) (recMD cb fe fm m2)
 
 profundidad :: MultiDict a b -> Integer
-profundidad = foldMD 0 (\k v r1 -> max 1 r1) (\k r1 r2 -> (max (r1+1) r2))
+profundidad = foldMD 0 (\_ _ r1 -> max 1 r1) (\_ r1 r2 -> max (r1+1) r2)
 
 --Cantidad total de claves definidas en todos los niveles.
 tamaño :: MultiDict a b -> Integer
-tamaño = foldMD 0 (\k v r1 -> r1 + 1) (\k r1 r2 -> 1 + r1 + r2 )
+tamaño = foldMD 0 (\_ _ r1 -> r1 + 1) (\_ r1 r2 -> 1 + r1 + r2 )
 
 podarHasta = foldMD
           (\_ _ _ -> Nil)
@@ -62,27 +60,44 @@ podar long prof m = podarHasta m long prof long
 tablas :: Integer -> MultiDict Integer Integer
 tablas n = Multi n (tablaDelDesde n 1) (tablas (n + 1))
 
+-- MultiDict de profundidad 1, tabla del n comenzando desde a.
 tablaDelDesde :: Integer -> Integer -> MultiDict Integer Integer
 tablaDelDesde n a = Entry a (n * a) (tablaDelDesde n (a + 1))
 
 serialize :: (Show a, Show b) => MultiDict a b -> String
-serialize =  foldMD "[ ]" (\k v r -> "[" ++ (show k) ++ ": " ++ (show v) ++ ", " ++ r ++ "]" ) (\k r1 r2 -> "[" ++ (show k) ++ ": " ++ r1 ++ ", " ++ r2 ++ "]")
+serialize =  foldMD 
+          "[ ]" 
+          (\k v r -> "[" ++ (show k) ++ ": " ++ (show v) ++ ", " ++ r ++ "]" ) 
+          (\k r1 r2 -> "[" ++ (show k) ++ ": " ++ r1 ++ ", " ++ r2 ++ "]")
 
 mapMD :: (a->c) -> (b->d) -> MultiDict a b -> MultiDict c d
-mapMD f g = foldMD Nil (\k v r1 -> Entry (f k) (g v) r1) (\k r1 r2 ->  Multi (f k) r1 r2)
+mapMD f g = foldMD 
+                Nil 
+                (\k v r1 -> Entry (f k) (g v) r1) 
+                (\k r1 r2 ->  Multi (f k) r1 r2)
 
 --Filtra recursivamente mirando las claves de los subdiccionarios.
 filterMD :: (a->Bool) -> MultiDict a b -> MultiDict a b
-filterMD p = foldMD Nil (\k v r -> if p k then Entry k v r else r) (\k r1 r2 -> if p k then Multi k r1 r2 else r2)
+filterMD p = foldMD 
+                 Nil 
+                 (\k v r -> if p k then Entry k v r else r) 
+                 (\k r1 r2 -> if p k then Multi k r1 r2 else r2)
 
 enLexicon :: [String] -> MultiDict String b -> MultiDict String b
-enLexicon p = foldMD Nil (\k v r -> if (elem (convertirAMinuscula k) p) then Entry (convertirAMinuscula k) v r else r) (\k r1 r2 -> if (elem (convertirAMinuscula k) p) then Multi (convertirAMinuscula k) r1 r2 else r2)
+enLexicon p m = filterMD (flip elem p) (mapMD convertirAMinuscula id m) 
 
 convertirAMinuscula:: String -> String 
-convertirAMinuscula = foldr (\c r-> (toLower c) : r) [] 
+convertirAMinuscula = map toLower
+-- convertirAMinuscula = foldr (\c r-> (toLower c) : r) [] 
 
 cadena :: Eq a => b ->  [a] -> MultiDict a b
-cadena v = foldr (\c r -> if ((profundidad r) == 0) then Entry c v r  else Multi c r Nil ) (Nil)  
+cadena v = foldr 
+               (\c r -> 
+                   if ((profundidad r) == 0) then
+                       Entry c v r
+                   else 
+                       Multi c r Nil ) 
+               Nil  
 
 --Agrega a un multidiccionario una cadena de claves [c1, ..., cn], una por cada nivel,
 --donde el valor asociado a cada clave es un multidiccionario con la clave siguiente, y así sucesivamente hasta
@@ -94,17 +109,16 @@ definir (x:xs) v d = (recMD (\ks -> cadena v ks)
   where armarDic ks k resto interior = if null ks then Entry k v resto else Multi k interior resto
 
 obtener :: Eq a => [a] -> MultiDict a b -> Maybe b 
-obtener (x:xs) d = (foldMD (\ks -> Nothing) (fEntry) (fMulti)) d (x:xs)
-  where fEntry k1 v r (k:ks) =
-            if null ks && (k == k1) then 
-                Just v 
-            else 
-                r (k:ks)
-        fMulti k1 r1 r2 (k:ks) = 
-            if (k == k1) then 
-                if (null ks) then 
-                    r2 (k:ks)
-                else
-                    r1 ks 
-            else 
-                r2 (k:ks)
+obtener xs d = foldMD (const Nothing) fEntry fMulti d xs
+  where fEntry k1 v r claves =
+            case claves of [] -> Nothing
+                           (k:ks) -> if null ks && (k == k1) then 
+                                         Just v 
+                                     else 
+                                         r (k:ks)
+        fMulti k1 r1 r2 claves = 
+            case claves of [] -> Nothing
+                           (k:ks) -> if k == k1 then 
+                                         r1 ks 
+                                     else 
+                                         r2 (k:ks)
