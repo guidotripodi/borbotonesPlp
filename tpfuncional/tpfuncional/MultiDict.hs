@@ -30,11 +30,25 @@ instance (Show a, Show b) => Show (MultiDict a b) where
 
 foldMD :: b ->   (a -> c -> b -> b) -> (a -> b -> b -> b) ->  (MultiDict a c) -> b
 foldMD cb fe fm = recMD cb (\k v _ r -> fe k v r) (\k _ _ r1 r2 -> fm k r1 r2)
+<<<<<<< HEAD:tpfuncional/tpfuncional/MultiDict.hs
+=======
+
+--foldMD cb fe fm  Nil = cb
+--foldMD cb fe fm  (Entry k v multidicc) = fe k v (foldMD cb fe fm   multidicc)
+--foldMD cb fe fm   (Multi k m1 m2) = fm k (foldMD cb fe fm m1) (foldMD cb fe fm  m2)
+>>>>>>> 2f3207e684d89b360ee56a4a890febcb52464fcd:tpfuncional/MultiDict.hs
 
 recMD :: b  -> (a -> c -> MultiDict a c -> b -> b) -> (a -> MultiDict a c -> MultiDict a c -> b -> b -> b) -> MultiDict a c -> b
 recMD cb fe fm multi = case multi of Nil -> cb
                                      Entry k v m1 -> fe k v m1 (recMD cb fe fm m1)
                                      Multi k m1 m2 -> fm k m1 m2 (recMD cb fe fm m1) (recMD cb fe fm m2)
+<<<<<<< HEAD:tpfuncional/tpfuncional/MultiDict.hs
+=======
+
+--recMD cb fe fm  Nil = cb
+--recMD cb fe fm  (Entry k v multidicc) = fe k v (multidicc) (recMD cb fe fm   multidicc)
+--recMD cb fe fm  (Multi k m1 m2) = fm k m1 m2 (recMD cb fe fm m1) (recMD cb fe fm  m2)
+>>>>>>> 2f3207e684d89b360ee56a4a890febcb52464fcd:tpfuncional/MultiDict.hs
 
 profundidad :: MultiDict a b -> Integer
 profundidad = foldMD 0 (\_ _ r1 -> max 1 r1) (\_ r1 r2 -> max (r1+1) r2)
